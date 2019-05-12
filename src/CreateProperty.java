@@ -6,7 +6,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
+import org.semanticweb.owlapi.reasoner.*;
+import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.InferredAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator;
@@ -19,7 +20,7 @@ public class CreateProperty {
 
     private  static  final String DOC_URL = "http://www.semanticweb.org/anast/ontologies/2019/3/ont_PS.owl";
 
-    public static void main (String[] args) {
+    public static void main (String[] args)  {
         // BuiltInRegistry.instance.registerBuiltIn("urn:makub:builtIn#IRIparts", new CustomSWRLBuiltin(new IRIparts()));
 
 
@@ -31,13 +32,26 @@ public class CreateProperty {
 //            reasoner = reasoner.bindSchema(shema);
 //            InfModel inf = ModelFactory.createInfModel(reasoner, data);
 
-            OntModel model = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC, null);
-            model.read(DOC_URL);
-
-            model.prepare();
 
 
-//            OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+           OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+          // IRI iri = IRI.create("http://www.semanticweb.org/anast/ontologies/2019/3/ont_PS.owl");
+           File file = new File("C:\\Users\\anast\\Desktop\\magistratura\\project\\ontologies\\ont_17.owl");
+        OWLOntology ontology = null;
+        try {
+            // ontology = manager.loadOntologyFromOntologyDocument(iri);
+            ontology = manager.loadOntologyFromOntologyDocument(file);
+        } catch (OWLOntologyCreationException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Load ontology: " + ontology);
+        OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
+        ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
+        OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
+        OWLReasoner reasoner = reasonerFactory.createReasoner(ontology, config);
+        reasoner.precomputeInferences();
+
+
 //            owlInputStream = new FileInputStream("C:\\Users\\anast\\Desktop\\magistratura\\project\\ontologies\\ont_PS1.owl");
 //            // OWLOntology ontology = manager.loadOntologyFromOntologyDocument(owlInputStream);
 ////            OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(DOC_URL));
