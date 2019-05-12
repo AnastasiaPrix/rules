@@ -1,16 +1,22 @@
-import com.clarkparsia.owlapiv3.OWL;
+//import com.clarkparsia.owlapiv3.OWL;
 //import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
 //import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
+import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
+import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import org.mindswap.pellet.jena.PelletReasonerFactory;
+// import org.mindswap.pellet.jena.PelletReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.dlsyntax.renderer.DLSyntaxObjectRenderer;
+import org.semanticweb.owlapi.io.OWLObjectRenderer;
 import org.semanticweb.owlapi.reasoner.*;
+import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.InferredAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.semanticweb.owlapi.util.InferredPropertyAssertionGenerator;
+import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,7 +24,8 @@ import java.util.List;
 
 public class CreateProperty {
 
-    private  static  final String DOC_URL = "http://www.semanticweb.org/anast/ontologies/2019/3/ont_PS.owl";
+    private  static  final String DOC_URL = "http://www.semanticweb.org/anast/ontologies/2019/3/untitled-ontology-22";
+    private static OWLObjectRenderer renderer = new DLSyntaxObjectRenderer();
 
     public static void main (String[] args)  {
         // BuiltInRegistry.instance.registerBuiltIn("urn:makub:builtIn#IRIparts", new CustomSWRLBuiltin(new IRIparts()));
@@ -35,6 +42,7 @@ public class CreateProperty {
 
 
            OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+
           // IRI iri = IRI.create("http://www.semanticweb.org/anast/ontologies/2019/3/ont_PS.owl");
            File file = new File("C:\\Users\\anast\\Desktop\\magistratura\\project\\ontologies\\ont_17.owl");
         OWLOntology ontology = null;
@@ -45,11 +53,58 @@ public class CreateProperty {
             e.printStackTrace();
         }
         System.out.println("Load ontology: " + ontology);
-        OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
-        ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
-        OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
-        OWLReasoner reasoner = reasonerFactory.createReasoner(ontology, config);
-        reasoner.precomputeInferences();
+
+// some reasoner work!!!!!!!!!!!!!!!!!!!!!!!!
+
+//        OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
+//        ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
+//        OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
+//        OWLReasoner reasoner = reasonerFactory.createReasoner(ontology, config);
+//        reasoner.precomputeInferences();
+//        boolean consistent = reasoner.isConsistent();
+//        System.out.println("Consistent " + consistent);
+//        System.out.println("\n");
+
+//        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+       // OWLReasonerFactory reasonerFactory = PelletReasonerFactory.getInstance();
+        // ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
+       // OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
+       // OWLReasoner reasoner = reasonerFactory.createReasoner(ontology, config);
+       // PelletReasoner reasoner = (PelletReasoner) reasonerFactory.createReasoner(ontology, new SimpleConfiguration());
+
+
+        PelletReasoner reasoner = PelletReasonerFactory.getInstance().createReasoner(ontology, new SimpleConfiguration());
+        OWLDataFactory factory = manager.getOWLDataFactory();
+
+        List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+        axiomGenerators.add(new InferredPropertyAssertionGenerator());
+
+        InferredOntologyGenerator gen = new InferredOntologyGenerator(reasoner, axiomGenerators);
+        gen.fillOntology(factory, ontology);
+
+//        PrefixOWLOntologyFormat pm = (PrefixOWLOntologyFormat) manager.getOntologyFormat(ontology);
+//        pm.setDefaultPrefix(DOC_URL + "#");
+//        OWLClass XSWIClass = factory.getOWLClass(":XSWI", pm);
+//
+//        for (OWLNamedIndividual xswi : reasoner.getInstances(XSWIClass, false).getFlattened()) {
+//            System.out.println("xswi : " + renderer.render(xswi));
+//        }
+        //reasoner.precomputeInferences();
+
+
+//        List<InferredAxiomGenerator<? extends OWLAxiom>> axiomGenerators = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+//        axiomGenerators.add(new InferredPropertyAssertionGenerator());
+//
+//        InferredOntologyGenerator gen = new InferredOntologyGenerator(reasoner, axiomGenerators);
+//        gen.fillOntology((OWLDataFactory) manager, ontology);
+
+
+
+
+
+
 
 
 //            owlInputStream = new FileInputStream("C:\\Users\\anast\\Desktop\\magistratura\\project\\ontologies\\ont_PS1.owl");
